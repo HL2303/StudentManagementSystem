@@ -1,0 +1,11 @@
+# Dependencies
+/Frontend/node_modules
+/packages
+
+# Build output
+/Backend/bin
+/Backend/obj
+/Frontend/.next
+
+# IDE folders
+.vs/
