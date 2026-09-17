@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:      #F6F3EC;
+    --paper-raised:#FCFAF4;
+    --ink:        #23282A;
+    --ink-soft:   #5B6366;
+    --rule:       #D9D2C0;
+    --rule-strong:#B9AE93;
+    --maroon:     #7C2A32;
+    --maroon-dark:#5E1F26;
+    --brass:      #B08A2E;
+    --stamp-green:#4B6449;
+    --danger:     #A23B3B;
+    --danger-dark:#7E2E2E;
+    --shadow: 0 1px 0 rgba(35,40,42,0.06);
+    --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    --sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'IBM Plex Mono', 'Courier New', monospace;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.015), rgba(0,0,0,0) 200px),
+      var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .wrap{
+    max-width:1040px;
+    margin:0 auto;
+    padding:40px 28px 80px;
+  }
+
+  /* ---------- Header : ledger title block ---------- */
+  header.ledger-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    padding-bottom:22px;
+    border-bottom:2px solid var(--ink);
+    margin-bottom:28px;
+  }
+  .title-block h1{
+    font-family:var(--serif);
+    font-weight:700;
+    font-size:2.35rem;
+    margin:0 0 6px 0;
+    letter-spacing:-0.01em;
+  }
+  .title-block p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:0.95rem;
+    max-width:44ch;
+  }
+  .record-count{
+    font-family:var(--mono);
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    text-align:right;
+    white-space:nowrap;
+    padding-bottom:4px;
+  }
+  .record-count strong{
+    display:block;
+    font-family:var(--serif);
+    font-size:1.9rem;
+    color:var(--ink);
+    font-weight:600;
+    line-height:1;
+    margin-bottom:2px;
+  }
+
+  /* ---------- Connection strip ---------- */
+  .conn-strip{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:0.82rem;
+    color:var(--ink-soft);
+    margin-bottom:26px;
+    flex-wrap:wrap;
+  }
+  .conn-dot{
+    width:8px; height:8px; border-radius:50%;
+    background:var(--danger);
+    flex:none;
+    transition:background 0.2s ease;
+  }
+  .conn-dot.ok{ background:var(--stamp-green); }
+  .conn-strip button{
+    background:none;
+    border:none;
+    color:var(--maroon);
+    font-family:var(--sans);
+    font-size:0.82rem;
+    text-decoration:underline;
+    cursor:pointer;
+    padding:0;
+  }
+  .conn-edit{
+    display:none;
+    align-items:center;
+    gap:8px;
+  }
+  .conn-edit.open{ display:flex; }
+  .conn-edit input{
+    font-family:var(--mono);
+    font-size:0.8rem;
+    padding:5px 8px;
+    border:1px solid var(--rule-strong);
+    background:var(--paper-raised);
+    border-radius:3px;
+    color:var(--ink);
+    width:260px;
+  }
+  .conn-edit button.save{
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    font-size:0.78rem;
+    padding:6px 12px;
+    border-radius:3px;
+    cursor:pointer;
+    font-family:var(--sans);
+  }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+  }
+  .search-field{
+    position:relative;
+    flex:1;
+    min-width:200px;
+    max-width:340px;
+  }
+  .search-field input{
+    width:100%;
+    padding:10px 12px 10px 32px;
+    border:1px solid var(--rule-strong);
+    background:var(--paper-raised);
+    border-radius:4px;
+    font-family:var(--sans);
+    font-size:0.9rem;
+    color:var(--ink);
+  }
+  .search-field input:focus{
+    outline:2px solid var(--maroon);
+    outline-offset:1px;
+  }
+  .search-field::before{
+    content:"";
+    position:absolute;
+    left:11px; top:50%;
+    width:12px; height:12px;
+    margin-top:-7px;
+    border:1.5px solid var(--ink-soft);
+    border-radius:50%;
+  }
+  .search-field::after{
+    content:"";
+    position:absolute;
+    left:20px; top:50%;
+    width:6px; height:1.5px;
+    margin-top:5px;
+    background:var(--ink-soft);
+    transform:rotate(45deg);
+  }
+
+  .btn{
+    font-family:var(--sans);
+    font-weight:500;
+    font-size:0.88rem;
+    padding:10px 18px;
+    border-radius:4px;
+    border:1px solid transparent;
+    cursor:pointer;
+    transition:transform 0.05s ease, background 0.15s ease;
+  }
+  .btn:active{ transform:translateY(1px); }
+  .btn-primary{
+    background:var(--maroon);
+    color:#fff;
+  }
+  .btn-primary:hover{ background:var(--maroon-dark); }
+  .btn-ghost{
+    background:transparent;
+    border:1px solid var(--rule-strong);
+    color:var(--ink);
+  }
+  .btn-ghost:hover{ background:rgba(0,0,0,0.03); }
+
+  /* ---------- Ledger table ---------- */
+  .ledger{
+    background:var(--paper-raised);
+    border:1px solid var(--rule);
+    border-radius:6px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+  }
+  thead th{
+    text-align:left;
+    font-family:var(--mono);
+    font-size:0.72rem;
+    font-weight:500;
+    color:var(--ink-soft);
+    letter-spacing:0.03em;
+    padding:14px 18px;
+    border-bottom:1.5px solid var(--ink);
+    background:rgba(124,42,50,0.03);
+  }
+  thead th.num{ text-align:right; }
+  tbody td{
+    padding:15px 18px;
+    border-bottom:1px solid var(--rule);
+    font-size:0.92rem;
+    vertical-align:middle;
+  }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:rgba(124,42,50,0.025); }
+  .cell-name{
+    font-family:var(--serif);
+    font-size:1.02rem;
+    font-weight:600;
+  }
+  .cell-email{
+    color:var(--ink-soft);
+    font-family:var(--mono);
+    font-size:0.82rem;
+  }
+  .cell-dob{
+    font-family:var(--mono);
+    font-size:0.82rem;
+    color:var(--ink-soft);
+  }
+  .row-id{
+    font-family:var(--mono);
+    font-size:0.78rem;
+    color:var(--rule-strong);
+    width:1%;
+    white-space:nowrap;
+  }
+  .row-actions{
+    text-align:right;
+    white-space:nowrap;
+  }
+  .icon-btn{
+    background:none;
+    border:none;
+    cursor:pointer;
+    font-family:var(--sans);
+    font-size:0.82rem;
+    padding:5px 9px;
+    border-radius:3px;
+    color:var(--ink-soft);
+  }
+  .icon-btn:hover{ background:rgba(0,0,0,0.05); color:var(--ink); }
+  .icon-btn.danger:hover{ color:var(--danger-dark); background:rgba(162,59,59,0.08); }
+
+  /* ---------- Empty / loading / error states ---------- */
+  .state-panel{
+    padding:64px 24px;
+    text-align:center;
+  }
+  .state-panel .mark{
+    font-family:var(--serif);
+    font-size:2.4rem;
+    color:var(--rule-strong);
+    margin-bottom:10px;
+  }
+  .state-panel h3{
+    font-family:var(--serif);
+    font-size:1.2rem;
+    margin:0 0 6px 0;
+  }
+  .state-panel p{
+    color:var(--ink-soft);
+    font-size:0.88rem;
+    margin:0 0 18px 0;
+  }
+  .state-panel.error h3{ color:var(--danger-dark); }
+  .spinner{
+    width:22px; height:22px;
+    border-radius:50%;
+    border:2.5px solid var(--rule);
+    border-top-color:var(--maroon);
+    margin:0 auto 14px;
+    animation:spin 0.8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* ---------- Modal ---------- */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(35,40,42,0.45);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:50;
+  }
+  .overlay.open{ display:flex; }
+  .modal{
+    background:var(--paper-raised);
+    border-radius:8px;
+    width:100%;
+    max-width:440px;
+    max-height:90vh;
+    overflow-y:auto;
+    box-shadow:0 12px 40px rgba(0,0,0,0.25);
+    border:1px solid var(--rule);
+  }
+  .modal-head{
+    padding:22px 26px 16px;
+    border-bottom:1px solid var(--rule);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .modal-head h2{
+    font-family:var(--serif);
+    font-size:1.3rem;
+    margin:0;
+  }
+  .modal-head button{
+    background:none; border:none;
+    font-size:1.1rem;
+    color:var(--ink-soft);
+    cursor:pointer;
+    line-height:1;
+    padding:4px;
+  }
+  .modal-body{ padding:22px 26px; }
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block;
+    font-size:0.78rem;
+    font-family:var(--mono);
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .field input{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--rule-strong);
+    border-radius:4px;
+    font-family:var(--sans);
+    font-size:0.92rem;
+    background:#fff;
+    color:var(--ink);
+  }
+  .field input:focus{
+    outline:2px solid var(--maroon);
+    outline-offset:1px;
+  }
+  .field-error{
+    color:var(--danger-dark);
+    font-size:0.78rem;
+    margin-top:5px;
+    display:none;
+  }
+  .field.invalid input{ border-color:var(--danger); }
+  .field.invalid .field-error{ display:block; }
+  .modal-foot{
+    padding:16px 26px 22px;
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+  }
+  .form-error{
+    background:rgba(162,59,59,0.08);
+    border:1px solid rgba(162,59,59,0.25);
+    color:var(--danger-dark);
+    font-size:0.84rem;
+    padding:10px 14px;
+    border-radius:4px;
+    margin-bottom:16px;
+    display:none;
+  }
+  .form-error.show{ display:block; }
+
+  /* ---------- Delete confirm ---------- */
+  .confirm-modal .modal{ max-width:380px; }
+  .confirm-modal .modal-body{ font-size:0.9rem; color:var(--ink-soft); }
+  .confirm-modal .modal-body strong{ color:var(--ink); }
+
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed;
+    bottom:24px; left:50%;
+    transform:translateX(-50%) translateY(12px);
+    background:var(--ink);
+    color:var(--paper);
+    padding:11px 20px;
+    border-radius:5px;
+    font-size:0.85rem;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.2s ease, transform 0.2s ease;
+    z-index:100;
+  }
+  .toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+
+  footer.seal{
+    margin-top:34px;
+    text-align:center;
+    font-family:var(--mono);
+    font-size:0.72rem;
+    color:var(--rule-strong);
+    letter-spacing:0.02em;
+  }
+
+  @media (max-width: 640px){
+    .wrap{ padding:26px 16px 60px; }
+    header.ledger-head{ flex-direction:column; align-items:flex-start; gap:10px; }
+    .record-count{ text-align:left; }
+    thead th.email-col, tbody td.email-col{ display:none; }
+    .title-block h1{ font-size:1.9rem; }
+  }
+
+  :focus-visible{ outline:2px solid var(--maroon); outline-offset:2px; }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; transition-duration:0.001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="ledger-head">
+    <div class="title-block">
+      <h1>Student Register</h1>
+      <p>Records held by the Student Management System — add, amend, or retire entries below.</p>
+    </div>
+    <div class="record-count">
+      <strong id="recordTotal">—</strong>
+      entries on file
+    </div>
+  </header>
+
+  <div class="conn-strip">
+    <span class="conn-dot" id="connDot"></span>
+    <span id="connLabel">Checking connection…</span>
+    <button id="connToggle" type="button">change</button>
+    <div class="conn-edit" id="connEdit">
+      <input id="connInput" type="text" spellcheck="false" placeholder="http://localhost:5267/api/students">
+      <button class="save" id="connSave" type="button">Use this address</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-field">
+      <input id="searchInput" type="text" placeholder="Search by name or email" autocomplete="off">
+    </div>
+    <button class="btn btn-primary" id="addBtn" type="button">+ Add student</button>
+  </div>
+
+  <div class="ledger">
+    <table id="table" style="display:none;">
+      <thead>
+        <tr>
+          <th class="row-id">Id</th>
+          <th>Name</th>
+          <th class="email-col">Email</th>
+          <th>Date of birth</th>
+          <th class="num">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+
+    <div class="state-panel" id="stateLoading">
+      <div class="spinner"></div>
+      <p>Fetching the register…</p>
+    </div>
+
+    <div class="state-panel error" id="stateError" style="display:none;">
+      <div class="mark">!</div>
+      <h3>Couldn't reach the API</h3>
+      <p id="errorDetail">Check that the backend is running and the address above is correct.</p>
+      <button class="btn btn-ghost" id="retryBtn" type="button">Try again</button>
+    </div>
+
+    <div class="state-panel" id="stateEmpty" style="display:none;">
+      <div class="mark">＋</div>
+      <h3>No students yet</h3>
+      <p>Add the first record to start the register.</p>
+      <button class="btn btn-primary" id="emptyAddBtn" type="button">Add student</button>
+    </div>
+
+    <div class="state-panel" id="stateNoResults" style="display:none;">
+      <div class="mark">?</div>
+      <h3>No matches</h3>
+      <p>Nothing in the register matches your search.</p>
+    </div>
+  </div>
+
+  <footer class="seal">STUDENT MANAGEMENT SYSTEM · LOCAL REGISTER VIEW</footer>
+</div>
+
+<!-- Add / Edit modal -->
+<div class="overlay" id="formOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="formTitle">Add student</h2>
+      <button id="formClose" type="button" aria-label="Close">✕</button>
+    </div>
+    <form id="studentForm">
+      <div class="modal-body">
+        <div class="form-error" id="formError"></div>
+
+        <div class="field" id="fld-firstName">
+          <label for="firstName">First name</label>
+          <input id="firstName" name="firstName" type="text" maxlength="50" required>
+          <div class="field-error">First name is required.</div>
+        </div>
+
+        <div class="field" id="fld-lastName">
+          <label for="lastName">Last name</label>
+          <input id="lastName" name="lastName" type="text" maxlength="50" required>
+          <div class="field-error">Last name is required.</div>
+        </div>
+
+        <div class="field" id="fld-email">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" maxlength="100" required>
+          <div class="field-error">Enter a valid email address.</div>
+        </div>
+
+        <div class="field" id="fld-dob">
+          <label for="dob">Date of birth</label>
+          <input id="dob" name="dob" type="date" required>
+          <div class="field-error">Date of birth is required.</div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" id="formCancel">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="formSubmit">Save student</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete confirm modal -->
+<div class="overlay confirm-modal" id="deleteOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Remove student</h2>
+      <button id="deleteClose" type="button" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Remove <strong id="deleteName"></strong> from the register? This can't be undone.</p>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-ghost" id="deleteCancel">Cancel</button>
+      <button type="button" class="btn btn-primary" id="deleteConfirm" style="background:var(--danger);">Remove</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var DEFAULT_API = "http://localhost:5267/api/students";
+  var apiBase = localStorage.getItem("sms_api_base") || DEFAULT_API;
+
+  var students = [];
+  var searchTerm = "";
+  var editingId = null;
+  var deletingId = null;
+
+  // ---- DOM refs ----
+  var el = {
+    connDot: document.getElementById("connDot"),
+    connLabel: document.getElementById("connLabel"),
+    connToggle: document.getElementById("connToggle"),
+    connEdit: document.getElementById("connEdit"),
+    connInput: document.getElementById("connInput"),
+    connSave: document.getElementById("connSave"),
+    recordTotal: document.getElementById("recordTotal"),
+    searchInput: document.getElementById("searchInput"),
+    addBtn: document.getElementById("addBtn"),
+    emptyAddBtn: document.getElementById("emptyAddBtn"),
+    table: document.getElementById("table"),
+    tbody: document.getElementById("tbody"),
+    stateLoading: document.getElementById("stateLoading"),
+    stateError: document.getElementById("stateError"),
+    errorDetail: document.getElementById("errorDetail"),
+    stateEmpty: document.getElementById("stateEmpty"),
+    stateNoResults: document.getElementById("stateNoResults"),
+    retryBtn: document.getElementById("retryBtn"),
+    formOverlay: document.getElementById("formOverlay"),
+    formTitle: document.getElementById("formTitle"),
+    formClose: document.getElementById("formClose"),
+    formCancel: document.getElementById("formCancel"),
+    studentForm: document.getElementById("studentForm"),
+    formError: document.getElementById("formError"),
+    formSubmit: document.getElementById("formSubmit"),
+    firstName: document.getElementById("firstName"),
+    lastName: document.getElementById("lastName"),
+    email: document.getElementById("email"),
+    dob: document.getElementById("dob"),
+    deleteOverlay: document.getElementById("deleteOverlay"),
+    deleteName: document.getElementById("deleteName"),
+    deleteClose: document.getElementById("deleteClose"),
+    deleteCancel: document.getElementById("deleteCancel"),
+    deleteConfirm: document.getElementById("deleteConfirm"),
+    toast: document.getElementById("toast")
+  };
+
+  el.connInput.value = apiBase;
+
+  // ---- helpers ----
+  function showToast(msg){
+    el.toast.textContent = msg;
+    el.toast.classList.add("show");
+    setTimeout(function(){ el.toast.classList.remove("show"); }, 2600);
+  }
+
+  function escapeHtml(s){
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+    });
+  }
+
+  function formatDob(value){
+    if(!value) return "—";
+    var d = new Date(value);
+    if(isNaN(d.getTime())) return escapeHtml(value);
+    return d.toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" });
+  }
+
+  function toInputDate(value){
+    if(!value) return "";
+    var d = new Date(value);
+    if(isNaN(d.getTime())) return "";
+    var mm = String(d.getMonth()+1).padStart(2,"0");
+    var dd = String(d.getDate()).padStart(2,"0");
+    return d.getFullYear() + "-" + mm + "-" + dd;
+  }
+
+  function setConnState(ok, label){
+    el.connDot.classList.toggle("ok", !!ok);
+    el.connLabel.textContent = label;
+  }
+
+  function setAllStates(hidden){
+    [el.table, el.stateLoading, el.stateError, el.stateEmpty, el.stateNoResults].forEach(function(node){
+      node.style.display = "none";
+    });
+  }
+
+  // ---- rendering ----
+  function render(){
+    var filtered = students.filter(function(s){
+      if(!searchTerm) return true;
+      var hay = ((s.firstName||"") + " " + (s.lastName||"") + " " + (s.email||"")).toLowerCase();
+      return hay.indexOf(searchTerm) !== -1;
+    });
+
+    el.recordTotal.textContent = students.length;
+
+    setAllStates();
+
+    if(students.length === 0){
+      el.stateEmpty.style.display = "block";
+      return;
+    }
+    if(filtered.length === 0){
+      el.stateNoResults.style.display = "block";
+      return;
+    }
+
+    el.table.style.display = "table";
+    el.tbody.innerHTML = filtered.map(function(s){
+      var name = escapeHtml((s.firstName||"") + " " + (s.lastName||""));
+      return (
+        '<tr data-id="' + escapeHtml(s.id) + '">' +
+          '<td class="row-id">#' + escapeHtml(s.id) + '</td>' +
+          '<td class="cell-name">' + name + '</td>' +
+          '<td class="cell-email email-col">' + escapeHtml(s.email) + '</td>' +
+          '<td class="cell-dob">' + formatDob(s.dateOfBirth) + '</td>' +
+          '<td class="row-actions">' +
+            '<button class="icon-btn edit-btn" type="button">Edit</button>' +
+            '<button class="icon-btn danger delete-btn" type="button">Delete</button>' +
+          '</td>' +
+        '</tr>'
+      );
+    }).join("");
+  }
+
+  function showLoading(){
+    setAllStates();
+    el.stateLoading.style.display = "block";
+  }
+
+  function showError(message){
+    setAllStates();
+    el.errorDetail.textContent = message;
+    el.stateError.style.display = "block";
+    setConnState(false, "Not connected");
+  }
+
+  // ---- API ----
+  function request(path, options){
+    options = options || {};
+    var url = apiBase + (path || "");
+    var opts = {
+      method: options.method || "GET",
+      headers: { "Content-Type": "application/json" }
+    };
+    if(options.body !== undefined){ opts.body = JSON.stringify(options.body); }
+    return fetch(url, opts).then(function(res){
+      if(!res.ok){
+        return res.text().then(function(text){
+          var err = new Error(text || (res.status + " " + res.statusText));
+          err.status = res.status;
+          throw err;
+        });
+      }
+      if(res.status === 204) return null;
+      return res.text().then(function(text){
+        return text ? JSON.parse(text) : null;
+      });
+    });
+  }
+
+  function loadStudents(){
+    showLoading();
+    return request("")
+      .then(function(data){
+        students = Array.isArray(data) ? data : [];
+        setConnState(true, "Connected — " + apiBase);
+        render();
+      })
+      .catch(function(err){
+        var msg = err && err.message ? err.message : "The request failed.";
+        showError("Couldn't load the register from " + apiBase + ". " + (err && err.status ? "" : "Confirm the API is running.") + (msg.length < 140 ? " " + msg : ""));
+      });
+  }
+
+  // ---- form modal ----
+  function clearFieldErrors(){
+    ["firstName","lastName","email","dob"].forEach(function(id){
+      document.getElementById("fld-" + (id === "dob" ? "dob" : id)).classList.remove("invalid");
+    });
+    el.formError.classList.remove("show");
+    el.formError.textContent = "";
+  }
+
+  function openAddForm(){
+    editingId = null;
+    el.formTitle.textContent = "Add student";
+    el.formSubmit.textContent = "Save student";
+    el.studentForm.reset();
+    clearFieldErrors();
+    el.formOverlay.classList.add("open");
+    el.firstName.focus();
+  }
+
+  function openEditForm(student){
+    editingId = student.id;
+    el.formTitle.textContent = "Edit student";
+    el.formSubmit.textContent = "Save changes";
+    el.firstName.value = student.firstName || "";
+    el.lastName.value = student.lastName || "";
+    el.email.value = student.email || "";
+    el.dob.value = toInputDate(student.dateOfBirth);
+    clearFieldErrors();
+    el.formOverlay.classList.add("open");
+    el.firstName.focus();
+  }
+
+  function closeForm(){
+    el.formOverlay.classList.remove("open");
+  }
+
+  function validateForm(){
+    var valid = true;
+    var firstName = el.firstName.value.trim();
+    var lastName = el.lastName.value.trim();
+    var email = el.email.value.trim();
+    var dob = el.dob.value;
+
+    clearFieldErrors();
+
+    if(!firstName){ document.getElementById("fld-firstName").classList.add("invalid"); valid = false; }
+    if(!lastName){ document.getElementById("fld-lastName").classList.add("invalid"); valid = false; }
+    if(!email || !/^\S+@\S+\.\S+$/.test(email)){ document.getElementById("fld-email").classList.add("invalid"); valid = false; }
+    if(!dob){ document.getElementById("fld-dob").classList.add("invalid"); valid = false; }
+
+    return valid ? { firstName: firstName, lastName: lastName, email: email, dateOfBirth: dob } : null;
+  }
+
+  function submitForm(e){
+    e.preventDefault();
+    var payload = validateForm();
+    if(!payload) return;
+
+    el.formSubmit.disabled = true;
+    var originalLabel = el.formSubmit.textContent;
+    el.formSubmit.textContent = "Saving…";
+
+    var promise = editingId
+      ? request("/" + editingId, { method: "PUT", body: Object.assign({ id: editingId }, payload) })
+      : request("", { method: "POST", body: payload });
+
+    promise
+      .then(function(){
+        closeForm();
+        showToast(editingId ? "Student updated." : "Student added.");
+        return loadStudents();
+      })
+      .catch(function(err){
+        var msg = err && err.message ? err.message : "Something went wrong saving this record.";
+        el.formError.textContent = msg.length < 200 ? msg : "The server rejected this record. Check the details and try again.";
+        el.formError.classList.add("show");
+      })
+      .finally(function(){
+        el.formSubmit.disabled = false;
+        el.formSubmit.textContent = originalLabel;
+      });
+  }
+
+  // ---- delete modal ----
+  function openDeleteConfirm(student){
+    deletingId = student.id;
+    el.deleteName.textContent = (student.firstName || "") + " " + (student.lastName || "");
+    el.deleteOverlay.classList.add("open");
+  }
+
+  function closeDeleteConfirm(){
+    el.deleteOverlay.classList.remove("open");
+    deletingId = null;
+  }
+
+  function confirmDelete(){
+    if(deletingId == null) return;
+    var id = deletingId;
+    el.deleteConfirm.disabled = true;
+    request("/" + id, { method: "DELETE" })
+      .then(function(){
+        closeDeleteConfirm();
+        showToast("Student removed.");
+        return loadStudents();
+      })
+      .catch(function(err){
+        showToast("Couldn't remove that record. " + (err && err.message ? err.message : ""));
+      })
+      .finally(function(){
+        el.deleteConfirm.disabled = false;
+      });
+  }
+
+  // ---- events ----
+  el.addBtn.addEventListener("click", openAddForm);
+  el.emptyAddBtn.addEventListener("click", openAddForm);
+  el.formClose.addEventListener("click", closeForm);
+  el.formCancel.addEventListener("click", closeForm);
+  el.formOverlay.addEventListener("click", function(e){ if(e.target === el.formOverlay) closeForm(); });
+  el.studentForm.addEventListener("submit", submitForm);
+
+  el.deleteClose.addEventListener("click", closeDeleteConfirm);
+  el.deleteCancel.addEventListener("click", closeDeleteConfirm);
+  el.deleteOverlay.addEventListener("click", function(e){ if(e.target === el.deleteOverlay) closeDeleteConfirm(); });
+  el.deleteConfirm.addEventListener("click", confirmDelete);
+
+  el.tbody.addEventListener("click", function(e){
+    var row = e.target.closest("tr");
+    if(!row) return;
+    var id = row.getAttribute("data-id");
+    var student = students.find(function(s){ return String(s.id) === String(id); });
+    if(!student) return;
+    if(e.target.classList.contains("edit-btn")) openEditForm(student);
+    if(e.target.classList.contains("delete-btn")) openDeleteConfirm(student);
+  });
+
+  el.searchInput.addEventListener("input", function(){
+    searchTerm = el.searchInput.value.trim().toLowerCase();
+    render();
+  });
+
+  el.retryBtn.addEventListener("click", loadStudents);
+
+  el.connToggle.addEventListener("click", function(){
+    el.connEdit.classList.toggle("open");
+    if(el.connEdit.classList.contains("open")) el.connInput.focus();
+  });
+  el.connSave.addEventListener("click", function(){
+    var value = el.connInput.value.trim().replace(/\/$/, "");
+    if(!value) return;
+    apiBase = value;
+    localStorage.setItem("sms_api_base", apiBase);
+    el.connEdit.classList.remove("open");
+    loadStudents();
+  });
+
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape"){
+      if(el.formOverlay.classList.contains("open")) closeForm();
+      if(el.deleteOverlay.classList.contains("open")) closeDeleteConfirm();
+    }
+  });
+
+  // ---- init ----
+  loadStudents();
+})();
+</script>
+</body>
+</html>
