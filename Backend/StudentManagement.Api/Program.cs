@@ -15,14 +15,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 // Configure CORS (Cross-Origin Resource Sharing)
-// This is essential to allow your React frontend (running on http://localhost:3000)
-// to send requests to this backend.
+// AllowAnyOrigin covers both the React app and the static HTML frontend
+// (which may be opened directly as a file, or served from any local port).
+// This is fine for local development — restrict it before deploying anywhere public.
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp",
+    options.AddPolicy("AllowFrontend",
         policyBuilder =>
         {
-            policyBuilder.WithOrigins("http://localhost:3000") // The URL of your React app
+            policyBuilder.AllowAnyOrigin()
                    .AllowAnyHeader()
                    .AllowAnyMethod();
         });
@@ -46,7 +47,7 @@ app.UseHttpsRedirection();
 
 // Enable the CORS policy you defined above.
 // This MUST be placed after UseHttpsRedirection and before UseAuthorization.
-app.UseCors("AllowReactApp");
+app.UseCors("AllowFrontend");
 
 app.UseAuthorization();
 
